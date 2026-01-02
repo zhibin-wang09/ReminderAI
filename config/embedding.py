@@ -1,6 +1,5 @@
 from config.database import chroma_collection
 from llama_index.core import PromptTemplate, Settings, StorageContext, VectorStoreIndex
-from llama_index.core.node_parser import SentenceSplitter
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 from llama_index.llms.ollama import Ollama
 from llama_index.vector_stores.chroma import ChromaVectorStore

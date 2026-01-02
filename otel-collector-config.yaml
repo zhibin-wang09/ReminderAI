@@ -14,8 +14,8 @@ exporters:
 service:
   pipelines:
     traces:
-      receivers: [otlp] # specify that OpenTelemetry protocol (OTLP) will be used to receive data over GRPC and HTTP
+      receivers: [otlp] # otlp receiver will send the data to traces pipeline
       exporters: [zipkin, debug] # define that telemetry data is logged to the console (debug) and sent to Zipkin server
-    metrics:
+    metrics: # otlp receiver will also send the data to metrics pipeline
       receivers: [otlp]
       exporters: [debug]

@@ -20,3 +20,5 @@ async def chat_stream(query: Query):
             yield token.encode("utf-8")
 
     return StreamingResponse(response_streamer(query.query), media_type="text/plain")
+
+#TODO: Write documentation about how to run this server and the architecture of the system
