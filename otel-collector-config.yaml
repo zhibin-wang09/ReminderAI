@@ -8,6 +8,7 @@ receivers:
 
 exporters:
   debug:
+    verbosity: detailed
   zipkin:
     endpoint: "http://zipkin:9411/api/v2/spans"
 
@@ -17,5 +18,8 @@ service:
       receivers: [otlp] # otlp receiver will send the data to traces pipeline
       exporters: [zipkin, debug] # define that telemetry data is logged to the console (debug) and sent to Zipkin server
     metrics: # otlp receiver will also send the data to metrics pipeline
+      receivers: [otlp]
+      exporters: [debug]
+    logs:
       receivers: [otlp]
       exporters: [debug]
