@@ -1,0 +1,21 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+exporters:
+  debug:
+  zipkin:
+    endpoint: "http://zipkin:9411/api/v2/spans"
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp] # specify that OpenTelemetry protocol (OTLP) will be used to receive data over GRPC and HTTP
+      exporters: [zipkin, debug] # define that telemetry data is logged to the console (debug) and sent to Zipkin server
+    metrics:
+      receivers: [otlp]
+      exporters: [debug]

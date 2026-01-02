@@ -17,7 +17,6 @@ async def chat_stream(query: Query):
     def response_streamer(query):
         streaming_response = query_engine.query(query)
         for token in streaming_response.response_gen:
-            print(token)
             yield token.encode("utf-8")
 
     return StreamingResponse(response_streamer(query.query), media_type="text/plain")
