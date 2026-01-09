@@ -36,7 +36,8 @@ def store_reminder(reminder: Reminder) -> Response:
         database.save_transcribed_recording(doc_id, reminder.transcription)
     except Exception as e:
         return Response(status_code=500, content=f"Error storing reminder: {str(e)}")
-    return Response(status_code=200, content=f"Reminder stored successfully for id: {doc_id}")
+    logging.info(f"Storing success for id: {doc_id}")
+    return Response(status_code=200, content=doc_id)
 
 @app.post("/chat")
 async def chat_stream(query: Query) -> StreamingResponse:
@@ -54,7 +55,8 @@ def delete_reminder(doc_id: str) -> Response:
         database.delete_transcribed_recording_by_id(doc_id)
     except Exception as e:
         return Response(status_code=500, content=f"Error deleting reminder: {str(e)}")
-    return Response(status_code=200, content=f"Reminder deleted successfully for id: {doc_id}")
+    logging.info(f"Deletion success for id: {doc_id}")
+    return Response(status_code=200, content=doc_id)
 
 @app.delete("/reminders")
 def clear_reminders() -> Response:
