@@ -1,4 +1,4 @@
-from config.database import chroma_collection
+from config.database import transcription_collection
 from llama_index.core import PromptTemplate, Settings, StorageContext, VectorStoreIndex
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 from llama_index.llms.ollama import Ollama
@@ -10,7 +10,7 @@ Settings.embed_model = embed_model
 Settings.llm = Ollama(model="llama2", system_prompt="You are a helpful assistant.")
 
 # create a our own swappable vector store component
-vector_store = ChromaVectorStore(chroma_collection = chroma_collection, mode="append")
+vector_store = ChromaVectorStore(chroma_collection = transcription_collection, mode="append")
 storage_context = StorageContext.from_defaults(vector_store=vector_store)
 
 # creating an index
@@ -35,3 +35,4 @@ template = ("Your name is Raisa, imagine you are a helpful assistant and "
 qa_template = PromptTemplate(template)
 
 query_engine = index.as_query_engine(text_qa_template=qa_template, streaming=True)
+
