@@ -1,4 +1,4 @@
-from model.transcription import Transcription
+from model.transcription import Reminder
 from model.query import Query
 
-__all__ = ["Transcription", "Query"]
+__all__ = ["Reminder", "Query"]

@@ -1,4 +1,4 @@
 from pydantic import BaseModel
 
-class Transcription(BaseModel):
+class Reminder(BaseModel):
     transcription: str
