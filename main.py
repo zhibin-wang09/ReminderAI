@@ -20,10 +20,14 @@ set_logger_provider(logger_provider)
 exporter = OTLPLogExporter(endpoint="http://localhost:4317", insecure=True)
 logger_provider.add_log_record_processor(BatchLogRecordProcessor(exporter))
 
-otel_handler = LoggingHandler(level=logging.INFO, logger_provider=logger_provider)
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
-logger.addHandler(otel_handler)
+otel_handler = LoggingHandler(level=logging.NOTSET, logger_provider=logger_provider)
+root_logger = logging.getLogger()
+root_logger.setLevel(logging.INFO)
+root_logger.addHandler(otel_handler)
+
+reminder_ai_logger = logging.getLogger("reminder-ai-logger")
+reminder_ai_logger.setLevel(logging.INFO)
+reminder_ai_logger.addHandler(otel_handler)
 
 app = FastAPI()
 FastAPIInstrumentor.instrument_app(app)
@@ -32,11 +36,11 @@ FastAPIInstrumentor.instrument_app(app)
 def store_reminder(reminder: Reminder) -> Response:
     try:
         doc_id: str = str(uuid.uuid4())
-        logging.info(f"Storing reminder initiated for id: {doc_id}")
+        reminder_ai_logger.info(f"Storing reminder initiated for id: {doc_id}")
         database.save_transcribed_recording(doc_id, reminder.transcription)
     except Exception as e:
         return Response(status_code=500, content=f"Error storing reminder: {str(e)}")
-    logging.info(f"Storing success for id: {doc_id}")
+    reminder_ai_logger.info(f"Storing success for id: {doc_id}")
     return Response(status_code=200, content=doc_id)
 
 @app.post("/chat")
@@ -45,23 +49,23 @@ async def chat_stream(query: Query) -> StreamingResponse:
         streaming_response = query_engine.query(query)
         for token in streaming_response.response_gen:
             yield token.encode("utf-8")
-    logging.info(f"Chatting initiated")
+    reminder_ai_logger.info(f"Chatting initiated")
     return StreamingResponse(response_streamer(query.query), media_type="text/plain")
 
 @app.delete("/reminder/{doc_id}")
 def delete_reminder(doc_id: str) -> Response:
     try:
-        logging.info(f"Deletion initiated for id: {doc_id}")
+        reminder_ai_logger.info(f"Deletion initiated for id: {doc_id}")
         database.delete_transcribed_recording_by_id(doc_id)
     except Exception as e:
         return Response(status_code=500, content=f"Error deleting reminder: {str(e)}")
-    logging.info(f"Deletion success for id: {doc_id}")
+    reminder_ai_logger.info(f"Deletion success for id: {doc_id}")
     return Response(status_code=200, content=doc_id)
 
 @app.delete("/reminders")
 def clear_reminders() -> Response:
     try:
-        logging.info(f"Clearing reminders collection")
+        reminder_ai_logger.info(f"Clearing reminders collection")
         transcription_collection.delete(ids=transcription_collection.get()["ids"])
     except Exception as e:
         return Response(status_code=500, content=f"Error clearing ChromaDB: {str(e)}")
@@ -69,6 +73,5 @@ def clear_reminders() -> Response:
 
 @app.get("/health")
 def health_check() -> Response:
-    logging.info("Health Check -- OK")
-    logging.debug("Health Check -- OK")
+    reminder_ai_logger.info("Health Check -- OK")
     return Response(status_code=200, content="OK")
