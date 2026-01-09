@@ -21,9 +21,9 @@ exporter = OTLPLogExporter(endpoint="http://localhost:4317", insecure=True)
 logger_provider.add_log_record_processor(BatchLogRecordProcessor(exporter))
 
 otel_handler = LoggingHandler(level=logging.INFO, logger_provider=logger_provider)
-logging.getLogger().addHandler(otel_handler)
-logger = logging.getLogger(__name__)
+logger = logging.getLogger()
 logger.setLevel(logging.INFO)
+logger.addHandler(otel_handler)
 
 app = FastAPI()
 FastAPIInstrumentor.instrument_app(app)
@@ -66,3 +66,9 @@ def clear_reminders() -> Response:
     except Exception as e:
         return Response(status_code=500, content=f"Error clearing ChromaDB: {str(e)}")
     return Response(status_code=200, content=f"ChromaDB cleared successfully")
+
+@app.get("/health")
+def health_check() -> Response:
+    logging.info("Health Check -- OK")
+    logging.debug("Health Check -- OK")
+    return Response(status_code=200, content="OK")
